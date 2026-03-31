@@ -21,4 +21,8 @@
     <ProjectReference Include="..\FantasyCalendar.Infrastructure\FantasyCalendar.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Services\" />
+  </ItemGroup>
+
 </Project>
