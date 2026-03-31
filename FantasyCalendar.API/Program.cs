@@ -12,6 +12,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<IEventService, EventService>();
+builder.Services.AddScoped<ICharacterService, CharacterService>();
 
 var app = builder.Build();
 
@@ -24,6 +25,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.MapCalendarEndpoints();
 app.MapEventEndpoints();
+app.MapCharacterEndpoints();
 
 using (var scope = app.Services.CreateScope())
 {
