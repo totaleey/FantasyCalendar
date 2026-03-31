@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="FantasyCalendar.API/FantasyCalendar.API.csproj" />
+  <Project Path="FantasyCalendar.Core/FantasyCalendar.Core.csproj" />
+  <Project Path="FantasyCalendar.Infrastructure/FantasyCalendar.Infrastructure.csproj" />
+</Solution>

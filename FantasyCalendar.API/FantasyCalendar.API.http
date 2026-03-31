@@ -1,0 +1,6 @@
+@FantasyCalendar.API_HostAddress = http://localhost:5100
+
+GET {{FantasyCalendar.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
