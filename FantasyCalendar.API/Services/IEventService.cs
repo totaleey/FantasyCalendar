@@ -1,0 +1,14 @@
+﻿using FantasyCalendar.Core.Models;
+
+namespace FantasyCalendar.API.Services;
+
+public interface IEventService
+{
+    Task<IEnumerable<Event>> GetEventsByCalendarAsync(Guid calendarId);
+    Task<Event?> GetEventByIdAsync(Guid id);
+    Task<Event> CreateEventAsync(Guid calendarId, Event newEvent);
+    Task<Event?> UpdateEventAsync(Guid id, Event updatedEvent);
+    Task<bool> DeleteEventAsync(Guid id);
+    Task<List<int>> ExpandRecurrenceAsync(Event recurringEvent, int maxDays = 1000);
+    Task<bool> EventExistsInCalendarAsync(Guid calendarId, Guid eventId);
+}
