@@ -42,6 +42,16 @@ public static class EventEndpoints
         group.MapPost("/events/{id}/expand", ExpandRecurrence)
             .WithName("ExpandRecurrence")
             .WithDescription("Expands a recurring event to show all occurrence days");
+
+        // POST /api/events/{id}/check-conflicts
+        group.MapPost("/events/{id}/check-conflicts", CheckConflicts)
+            .WithName("CheckEventConflicts")
+            .WithDescription("Checks if an event conflicts with other events or character availability");
+
+        // Also add this endpoint for checking character availability separately
+        group.MapPost("/events/{id}/check-character-availability", CheckCharacterAvailability)
+            .WithName("CheckCharacterAvailability")
+            .WithDescription("Checks if assigned characters are available for an event");
     }
 
     private static async Task<IResult> GetEventsByCalendar(
@@ -244,4 +254,39 @@ public static class EventEndpoints
             eventEntity.CalendarId
         );
     }
+
+    private static async Task<IResult> CheckConflicts(
+    Guid id,
+    [FromBody] ConflictCheckRequest? request,
+    IConflictService conflictService)
+    {
+        var characterIds = request?.CharacterIds;
+
+        try
+        {
+            var result = await conflictService.CheckEventConflictsAsync(id, characterIds);
+            return Results.Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return Results.NotFound(ex.Message);
+        }
+    }
+
+    private static async Task<IResult> CheckCharacterAvailability(
+        Guid id,
+        [FromBody] List<Guid>? characterIds,
+        IConflictService conflictService)
+    {
+        try
+        {
+            var result = await conflictService.CheckCharacterAvailabilityForEventAsync(id, characterIds);
+            return Results.Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return Results.NotFound(ex.Message);
+        }
+    }
+
 }

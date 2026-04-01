@@ -13,6 +13,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ICalendarService, CalendarService>();
 builder.Services.AddScoped<IEventService, EventService>();
 builder.Services.AddScoped<ICharacterService, CharacterService>();
+builder.Services.AddScoped<IConflictService, ConflictService>();
 
 var app = builder.Build();
 
