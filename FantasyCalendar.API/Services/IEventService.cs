@@ -11,4 +11,5 @@ public interface IEventService
     Task<bool> DeleteEventAsync(Guid id);
     Task<List<int>> ExpandRecurrenceAsync(Event recurringEvent, int maxDays = 1000);
     Task<bool> EventExistsInCalendarAsync(Guid calendarId, Guid eventId);
+    Task<List<int>> GetEventDaysAsync(Event eventEntity, int maxDays = 1000);
 }

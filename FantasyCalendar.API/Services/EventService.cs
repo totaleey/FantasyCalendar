@@ -166,4 +166,35 @@ public class EventService : IEventService
         return await _context.Events
             .AnyAsync(e => e.Id == eventId && e.CalendarId == calendarId);
     }
+
+    public async Task<List<int>> GetEventDaysAsync(Event eventEntity, int maxDays = 1000)
+    {
+        if (eventEntity.Recurrence != null)
+        {
+            // For recurring events, expand recurrence and add duration for each occurrence
+            var startDays = await ExpandRecurrenceAsync(eventEntity, maxDays);
+            var allDays = new List<int>();
+            var duration = eventEntity.EndDay - eventEntity.StartDay;
+
+            foreach (var startDay in startDays)
+            {
+                for (int day = startDay; day <= startDay + duration; day++)
+                {
+                    if (!allDays.Contains(day))
+                        allDays.Add(day);
+                }
+            }
+            return allDays.OrderBy(d => d).ToList();
+        }
+        else
+        {
+            // For one-time events, return all days from start to end
+            var days = new List<int>();
+            for (int day = eventEntity.StartDay; day <= eventEntity.EndDay; day++)
+            {
+                days.Add(day);
+            }
+            return days;
+        }
+    }
 }

@@ -31,10 +31,7 @@ public class ConflictService : IConflictService
             throw new ArgumentException($"Event with ID {eventId} not found");
         }
 
-        // Expand recurrence to get all occurrence days
-        var occurrenceDays = eventEntity.Recurrence != null
-            ? await _eventService.ExpandRecurrenceAsync(eventEntity, 500)
-            : new List<int> { eventEntity.StartDay };
+        var occurrenceDays = await _eventService.GetEventDaysAsync(eventEntity, 500);
 
         var eventConflicts = new List<EventConflict>();
         var characterConflicts = new List<CharacterConflict>();
@@ -213,9 +210,7 @@ public class ConflictService : IConflictService
 
         foreach (var eventEntity in allEvents)
         {
-            var eventOccurrences = eventEntity.Recurrence != null
-                ? await _eventService.ExpandRecurrenceAsync(eventEntity, 500)
-                : new List<int> { eventEntity.StartDay };
+            var eventOccurrences = await _eventService.GetEventDaysAsync(eventEntity, 500);
 
             if (occurrenceDays.Intersect(eventOccurrences).Any())
             {
