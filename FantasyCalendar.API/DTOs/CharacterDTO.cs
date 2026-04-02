@@ -42,3 +42,13 @@ public record CharacterAvailabilityResponse(
     bool IsAvailable,
     List<UnavailabilityResponse> ConflictingUnavailabilities
 );
+
+public record AssignCharacterRequest(
+    Guid CharacterId
+);
+
+public record EventCharacterResponse(
+    Guid EventId,
+    string EventTitle,
+    List<CharacterSummaryResponse> Characters
+);

@@ -52,6 +52,21 @@ public static class EventEndpoints
         group.MapPost("/events/{id}/check-character-availability", CheckCharacterAvailability)
             .WithName("CheckCharacterAvailability")
             .WithDescription("Checks if assigned characters are available for an event");
+
+        // POST /api/events/{id}/characters/{characterId}
+        group.MapPost("/events/{id}/characters/{characterId}", AssignCharacter)
+            .WithName("AssignCharacter")
+            .WithDescription("Assigns a character to an event");
+
+        // DELETE /api/events/{id}/characters/{characterId}
+        group.MapDelete("/events/{id}/characters/{characterId}", RemoveCharacter)
+            .WithName("RemoveCharacter")
+            .WithDescription("Removes a character from an event");
+
+        // GET /api/events/{id}/characters
+        group.MapGet("/events/{id}/characters", GetAssignedCharacters)
+            .WithName("GetAssignedCharacters")
+            .WithDescription("Gets all characters assigned to an event");
     }
 
     private static async Task<IResult> GetEventsByCalendar(
@@ -282,6 +297,58 @@ public static class EventEndpoints
         {
             var result = await conflictService.CheckCharacterAvailabilityForEventAsync(id, characterIds);
             return Results.Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return Results.NotFound(ex.Message);
+        }
+    }
+
+    private static async Task<IResult> AssignCharacter(
+    Guid id,
+    Guid characterId,
+    IEventService eventService)
+    {
+        try
+        {
+            await eventService.AssignCharacterAsync(id, characterId);
+            return Results.NoContent();
+        }
+        catch (ArgumentException ex)
+        {
+            return Results.NotFound(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Results.BadRequest(ex.Message);
+        }
+    }
+
+    private static async Task<IResult> RemoveCharacter(
+        Guid id,
+        Guid characterId,
+        IEventService eventService)
+    {
+        try
+        {
+            await eventService.RemoveCharacterAsync(id, characterId);
+            return Results.NoContent();
+        }
+        catch (ArgumentException ex)
+        {
+            return Results.NotFound(ex.Message);
+        }
+    }
+
+    private static async Task<IResult> GetAssignedCharacters(
+        Guid id,
+        IEventService eventService)
+    {
+        try
+        {
+            var characters = await eventService.GetAssignedCharactersAsync(id);
+            var response = characters.Select(c => new CharacterSummaryResponse(c.Id, c.Name));
+            return Results.Ok(response);
         }
         catch (ArgumentException ex)
         {

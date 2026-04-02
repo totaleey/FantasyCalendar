@@ -54,8 +54,13 @@ public class ConflictService : IConflictService
             ));
         }
 
-        // Check character availability if event has assigned characters or specific ones requested
         var charactersToCheck = characterIds ?? eventEntity.EventCharacters?.Select(ec => ec.CharacterId).ToList();
+
+        // If still null, no characters to check
+        if (charactersToCheck == null || !charactersToCheck.Any())
+        {
+            charactersToCheck = new List<Guid>();
+        }
 
         if (charactersToCheck != null && charactersToCheck.Any())
         {

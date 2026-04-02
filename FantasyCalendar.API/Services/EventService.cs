@@ -197,4 +197,72 @@ public class EventService : IEventService
             return days;
         }
     }
+
+    public async Task AssignCharacterAsync(Guid eventId, Guid characterId)
+    {
+        var eventEntity = await _context.Events.FindAsync(eventId);
+        if (eventEntity == null)
+        {
+            throw new ArgumentException($"Event with ID {eventId} not found");
+        }
+
+        var character = await _context.Characters.FindAsync(characterId);
+        if (character == null)
+        {
+            throw new ArgumentException($"Character with ID {characterId} not found");
+        }
+
+        // Check if already assigned
+        var existing = await _context.EventCharacters
+            .FirstOrDefaultAsync(ec => ec.EventId == eventId && ec.CharacterId == characterId);
+
+        if (existing != null)
+        {
+            throw new InvalidOperationException("Character is already assigned to this event");
+        }
+
+        var assignment = new EventCharacter
+        {
+            EventId = eventId,
+            CharacterId = characterId
+        };
+
+        _context.EventCharacters.Add(assignment);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task RemoveCharacterAsync(Guid eventId, Guid characterId)
+    {
+        var assignment = await _context.EventCharacters
+            .FirstOrDefaultAsync(ec => ec.EventId == eventId && ec.CharacterId == characterId);
+
+        if (assignment == null)
+        {
+            throw new ArgumentException("Character is not assigned to this event");
+        }
+
+        _context.EventCharacters.Remove(assignment);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<List<Character>> GetAssignedCharactersAsync(Guid eventId)
+    {
+        var eventEntity = await _context.Events.FindAsync(eventId);
+        if (eventEntity == null)
+        {
+            throw new ArgumentException($"Event with ID {eventId} not found");
+        }
+
+        return await _context.EventCharacters
+            .Where(ec => ec.EventId == eventId)
+            .Include(ec => ec.Character)
+            .Select(ec => ec.Character)
+            .ToListAsync();
+    }
+
+    public async Task<bool> IsCharacterAssignedAsync(Guid eventId, Guid characterId)
+    {
+        return await _context.EventCharacters
+            .AnyAsync(ec => ec.EventId == eventId && ec.CharacterId == characterId);
+    }
 }
